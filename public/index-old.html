@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P Network Visualizer</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌐 Simulador de Rede P2P</h1>
+            <p>Visualização e Análise de Algoritmos de Busca</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="panel">
+                    <h3>📁 Carregar Rede</h3>
+                    <div class="form-group">
+                        <label for="networkConfig">Configuração (JSON):</label>
+                        <select id="networkConfig">
+                            <option value="">Selecione...</option>
+                            <option value="example">Rede Exemplo (12 nós)</option>
+                            <option value="small">Rede Pequena (5 nós)</option>
+                            <option value="custom">Personalizado...</option>
+                        </select>
+                    </div>
+                    <button id="loadNetwork" class="btn btn-primary">Carregar Rede</button>
+                    <div id="networkStatus" class="status"></div>
+                </div>
+
+                <div class="panel">
+                    <h3>📊 Informações da Rede</h3>
+                    <div id="networkInfo" class="info-box">
+                        <p class="placeholder">Nenhuma rede carregada</p>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>🔍 Buscar Recurso</h3>
+                    <div class="form-group">
+                        <label for="startNode">Nó Inicial:</label>
+                        <input type="text" id="startNode" placeholder="n1">
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceId">Recurso:</label>
+                        <input type="text" id="resourceId" placeholder="r15">
+                    </div>
+                    <div class="form-group">
+                        <label for="ttl">TTL:</label>
+                        <input type="number" id="ttl" value="10" min="1" max="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="algorithm">Algoritmo:</label>
+                        <select id="algorithm">
+                            <option value="flooding">Flooding</option>
+                            <option value="informed_flooding">Informed Flooding</option>
+                            <option value="random_walk">Random Walk</option>
+                            <option value="informed_random_walk">Informed Random Walk</option>
+                        </select>
+                    </div>
+                    <button id="searchBtn" class="btn btn-success">Iniciar Busca</button>
+                    <button id="clearBtn" class="btn btn-secondary">Limpar</button>
+                </div>
+
+                <div class="panel">
+                    <h3>📈 Resultados</h3>
+                    <div id="searchResults" class="results-box">
+                        <p class="placeholder">Nenhuma busca realizada</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Visualization Area -->
+            <main class="visualization">
+                <div class="controls">
+                    <button id="resetZoom" class="btn btn-sm">Reset Zoom</button>
+                    <button id="centerGraph" class="btn btn-sm">Centralizar</button>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showLabels" checked>
+                        Mostrar Labels
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showResources">
+                        Mostrar Recursos
+                    </label>
+                </div>
+                <svg id="network-graph"></svg>
+                <div class="legend">
+                    <h4>Legenda</h4>
+                    <div class="legend-item">
+                        <span class="legend-circle node-normal"></span> Nó Normal
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-circle node-start"></span> Nó Inicial
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-circle node-visited"></span> Nó Visitado
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-circle node-found"></span> Recurso Encontrado
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/js/network-visualizer.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

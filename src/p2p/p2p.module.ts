@@ -1,0 +1,26 @@
+import { Module } from '@nestjs/common';
+import { P2PController } from './p2p.controller';
+import { NetworkService } from '../services/network.service';
+import { SearchService } from '../services/search.service';
+import { NetworkConfigParser } from '../parsers/network-config.parser';
+import { NetworkValidator } from '../validators/network-validator';
+import { FloodingAlgorithm } from '../algorithms/flooding.algorithm';
+import { InformedFloodingAlgorithm } from '../algorithms/informed-flooding.algorithm';
+import { RandomWalkAlgorithm } from '../algorithms/random-walk.algorithm';
+import { InformedRandomWalkAlgorithm } from '../algorithms/informed-random-walk.algorithm';
+
+@Module({
+  controllers: [P2PController],
+  providers: [
+    NetworkService,
+    SearchService,
+    NetworkConfigParser,
+    NetworkValidator,
+    FloodingAlgorithm,
+    InformedFloodingAlgorithm,
+    RandomWalkAlgorithm,
+    InformedRandomWalkAlgorithm,
+  ],
+  exports: [NetworkService, SearchService],
+})
+export class P2PModule {}
