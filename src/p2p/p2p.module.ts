@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { P2PController } from './p2p.controller';
 import { NetworkService } from '../services/network.service';
 import { SearchService } from '../services/search.service';
+import { PathAnalyzerService } from '../services/path-analyzer.service';
 import { NetworkConfigParser } from '../parsers/network-config.parser';
 import { NetworkValidator } from '../validators/network-validator';
 import { FloodingAlgorithm } from '../algorithms/flooding.algorithm';
@@ -14,6 +15,7 @@ import { InformedRandomWalkAlgorithm } from '../algorithms/informed-random-walk.
   providers: [
     NetworkService,
     SearchService,
+    PathAnalyzerService,
     NetworkConfigParser,
     NetworkValidator,
     FloodingAlgorithm,
@@ -21,6 +23,6 @@ import { InformedRandomWalkAlgorithm } from '../algorithms/informed-random-walk.
     RandomWalkAlgorithm,
     InformedRandomWalkAlgorithm,
   ],
-  exports: [NetworkService, SearchService],
+  exports: [NetworkService, SearchService, PathAnalyzerService],
 })
 export class P2PModule {}

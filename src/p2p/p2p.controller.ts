@@ -5,9 +5,11 @@ import {
   Post,
   HttpException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { NetworkService } from '../services/network.service';
 import { SearchService } from '../services/search.service';
+import { PathAnalyzerService } from '../services/path-analyzer.service';
 import { LoadNetworkDto } from './dto/load-network.dto';
 import { SearchResourceDto } from './dto/search-resource.dto';
 
@@ -16,6 +18,7 @@ export class P2PController {
   constructor(
     private readonly networkService: NetworkService,
     private readonly searchService: SearchService,
+    private readonly pathAnalyzerService: PathAnalyzerService,
   ) {}
 
   @Post('network/load')
@@ -148,6 +151,76 @@ export class P2PController {
     return {
       nodes: graphNodes,
       links: graphLinks,
+    };
+  }
+
+  @Get('path/analyze')
+  analyzePath(
+    @Query('origin') origin: string,
+    @Query('destination') destination: string,
+    @Query('ttl') ttl: string,
+  ) {
+    if (!this.networkService.hasNetwork()) {
+      throw new HttpException(
+        { message: 'No network loaded' },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (!origin || !destination || !ttl) {
+      throw new HttpException(
+        { message: 'Missing required parameters: origin, destination, ttl' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    try {
+      const network = this.networkService.getNetwork();
+      const result = this.pathAnalyzerService.analyzePaths(
+        network,
+        origin,
+        destination,
+        parseInt(ttl),
+      );
+
+      return result;
+    } catch (error: unknown) {
+      throw new HttpException(
+        {
+          message: 'Path analysis failed',
+          error: (error as Error).message,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Get('path/suggest')
+  suggestNodePairs(@Query('distance') distance: string) {
+    if (!this.networkService.hasNetwork()) {
+      throw new HttpException(
+        { message: 'No network loaded' },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (!distance) {
+      throw new HttpException(
+        { message: 'Missing required parameter: distance' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const network = this.networkService.getNetwork();
+    const pairs = this.pathAnalyzerService.findNodePairsWithDistance(
+      network,
+      parseInt(distance),
+    );
+
+    return {
+      targetDistance: parseInt(distance),
+      pairs,
+      total: pairs.length,
     };
   }
 }

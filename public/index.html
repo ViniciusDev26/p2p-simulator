@@ -480,6 +480,7 @@
                         <option value="">Selecione um template...</option>
                         <option value="small">Rede Pequena (5 nós)</option>
                         <option value="medium">Rede Média (12 nós)</option>
+                        <option value="large">Rede Grande (15 nós - min 3, max 4)</option>
                         <option value="custom">Personalizado</option>
                     </select>
                 </div>
@@ -573,6 +574,50 @@
                     <h3>📊 Comparação de Algoritmos</h3>
                     <div id="compareContent"></div>
                 </div>
+
+                <div class="search-controls">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🎯 Análise de Caminhos Random Walk</h3>
+
+                    <p style="font-size: 13px; margin-bottom: 15px; color: #666;">
+                        Analise todos os caminhos possíveis e calcule probabilidades
+                    </p>
+
+                    <div class="form-group">
+                        <label>Distância Desejada (saltos):</label>
+                        <input type="number" id="pathDistance" value="3" min="1" max="10">
+                    </div>
+
+                    <button class="btn btn-secondary" id="suggestPairsBtn" style="width: 100%;">💡 Sugerir Pares de Nós</button>
+
+                    <div id="pairSuggestions" style="display: none; margin: 15px 0;">
+                        <label style="font-weight: 600; margin-bottom: 5px; display: block;">Pares Sugeridos:</label>
+                        <select id="pairSelect" size="5" style="width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 4px;">
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nó Origem:</label>
+                            <input type="text" id="pathOrigin" placeholder="n1">
+                        </div>
+                        <div class="form-group">
+                            <label>Nó Destino:</label>
+                            <input type="text" id="pathDestination" placeholder="n8">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>TTL Máximo:</label>
+                        <input type="number" id="pathTtl" value="10" min="1" max="50">
+                    </div>
+
+                    <button class="btn btn-primary" id="analyzePathBtn" style="width: 100%;">🔍 Analisar Caminhos</button>
+                </div>
+
+                <div class="results-box" id="pathResults" style="display: none;">
+                    <h3>📈 Análise de Caminhos</h3>
+                    <div id="pathContent"></div>
+                </div>
             </div>
 
             <!-- RIGHT PANEL - OUTPUT -->
@@ -582,6 +627,7 @@
                 <div class="graph-controls">
                     <button class="btn btn-secondary" id="resetZoom">Reset Zoom</button>
                     <button class="btn btn-secondary" id="centerGraph">Centralizar</button>
+                    <button class="btn btn-success" id="exportBtn">📷 Exportar Topologia</button>
                     <label class="checkbox-label">
                         <input type="checkbox" id="showLabels" checked>
                         Mostrar Labels
@@ -677,6 +723,40 @@
                     ["n7", "n11"], ["n8", "n12"], ["n9", "n12"],
                     ["n10", "n11"], ["n11", "n12"]
                 ]
+            },
+            large: {
+                num_nodes: 15,
+                min_neighbors: 3,
+                max_neighbors: 4,
+                resources: {
+                    n1: ["r1"],
+                    n2: ["r2"],
+                    n3: ["r3"],
+                    n4: ["r4"],
+                    n5: ["r5"],
+                    n6: ["r6"],
+                    n7: ["r7"],
+                    n8: ["r8"],
+                    n9: ["r9"],
+                    n10: ["r10"],
+                    n11: ["r11"],
+                    n12: ["r12"],
+                    n13: ["r13"],
+                    n14: ["r14"],
+                    n15: ["r15"]
+                },
+                edges: [
+                    ["n1", "n2"], ["n1", "n3"], ["n1", "n4"],
+                    ["n2", "n5"], ["n2", "n6"], ["n2", "n7"],
+                    ["n3", "n7"], ["n3", "n8"], ["n3", "n9"],
+                    ["n4", "n9"], ["n4", "n10"], ["n4", "n11"],
+                    ["n5", "n12"], ["n5", "n6"], ["n5", "n1"],
+                    ["n6", "n12"], ["n6", "n13"],
+                    ["n7", "n13"], ["n8", "n13"], ["n8", "n14"],
+                    ["n9", "n14"], ["n10", "n14"], ["n10", "n15"],
+                    ["n11", "n15"], ["n11", "n12"], ["n11", "n14"],
+                    ["n12", "n15"], ["n13", "n15"]
+                ]
             }
         };
 
@@ -694,6 +774,10 @@
             document.getElementById('searchBtn').addEventListener('click', handleSearch);
             document.getElementById('clearSearchBtn').addEventListener('click', handleClearSearch);
             document.getElementById('compareBtn').addEventListener('click', handleCompare);
+            document.getElementById('suggestPairsBtn').addEventListener('click', handleSuggestPairs);
+            document.getElementById('analyzePathBtn').addEventListener('click', handleAnalyzePath);
+            document.getElementById('pairSelect').addEventListener('change', handlePairSelect);
+            document.getElementById('exportBtn').addEventListener('click', handleExport);
             document.getElementById('resetZoom').addEventListener('click', () => visualizer.resetZoom());
             document.getElementById('centerGraph').addEventListener('click', () => visualizer.centerGraph());
             document.getElementById('showLabels').addEventListener('change', (e) => visualizer.toggleLabels(e.target.checked));
@@ -1062,8 +1146,197 @@
             document.getElementById('networkInfo').style.display = 'none';
             document.getElementById('searchResults').style.display = 'none';
             document.getElementById('compareResults').style.display = 'none';
+            document.getElementById('pathResults').style.display = 'none';
             visualizer.render({ nodes: [], links: [] });
             currentNetwork = null;
+        }
+
+        async function handleSuggestPairs() {
+            if (!currentNetwork) {
+                alert('Carregue uma rede primeiro');
+                return;
+            }
+
+            const distance = parseInt(document.getElementById('pathDistance').value);
+
+            try {
+                const response = await fetch(`${API_URL}/p2p/path/suggest?distance=${distance}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erro ao sugerir pares');
+                }
+
+                const select = document.getElementById('pairSelect');
+                select.innerHTML = '';
+
+                if (data.pairs.length === 0) {
+                    select.innerHTML = '<option>Nenhum par encontrado com essa distância</option>';
+                } else {
+                    data.pairs.forEach(pair => {
+                        const option = document.createElement('option');
+                        option.value = JSON.stringify(pair);
+                        option.textContent = `${pair.origin} → ${pair.destination} (${pair.distance} saltos)`;
+                        select.appendChild(option);
+                    });
+                }
+
+                document.getElementById('pairSuggestions').style.display = 'block';
+                showStatus(`✓ Encontrados ${data.total} pares com ${distance} saltos`, 'success');
+            } catch (error) {
+                alert('Erro ao sugerir pares: ' + error.message);
+                console.error('Suggest pairs error:', error);
+            }
+        }
+
+        function handlePairSelect(e) {
+            if (!e.target.value) return;
+
+            try {
+                const pair = JSON.parse(e.target.value);
+                document.getElementById('pathOrigin').value = pair.origin;
+                document.getElementById('pathDestination').value = pair.destination;
+            } catch (error) {
+                console.error('Parse pair error:', error);
+            }
+        }
+
+        async function handleAnalyzePath() {
+            if (!currentNetwork) {
+                alert('Carregue uma rede primeiro');
+                return;
+            }
+
+            const origin = document.getElementById('pathOrigin').value.trim();
+            const destination = document.getElementById('pathDestination').value.trim();
+            const ttl = parseInt(document.getElementById('pathTtl').value);
+
+            if (!origin || !destination) {
+                alert('Preencha origem e destino');
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `${API_URL}/p2p/path/analyze?origin=${origin}&destination=${destination}&ttl=${ttl}`
+                );
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erro na análise');
+                }
+
+                displayPathAnalysis(data);
+            } catch (error) {
+                alert('Erro na análise: ' + error.message);
+                console.error('Analyze path error:', error);
+            }
+        }
+
+        function displayPathAnalysis(data) {
+            const resultsBox = document.getElementById('pathResults');
+            const content = document.getElementById('pathContent');
+
+            let html = `
+                <div class="compare-summary">
+                    <h4>📋 Informações Gerais</h4>
+                    <p><strong>Origem:</strong> ${data.origin}</p>
+                    <p><strong>Destino:</strong> ${data.destination}</p>
+                    <p><strong>Menor Distância:</strong> ${data.shortestDistance} saltos</p>
+                    <p><strong>Caminhos Possíveis:</strong> ${data.totalPaths}</p>
+                </div>
+
+                <div class="compare-summary" style="background: #d1fae5; border-color: #10b981;">
+                    <h4>✅ Melhor Caso (Caminho Mais Curto)</h4>
+                    <p><strong>Caminho:</strong> ${data.bestCase.path.join(' → ')}</p>
+                    <p><strong>Comprimento:</strong> ${data.bestCase.length} saltos</p>
+                    <p><strong>Probabilidade:</strong> ${(data.bestCase.probability * 100).toFixed(2)}% (${data.bestCase.probability.toFixed(4)})</p>
+                </div>
+
+                <div class="compare-summary" style="background: #fee2e2; border-color: #ef4444;">
+                    <h4>❌ Pior Caso (Caminho Mais Longo)</h4>
+                    <p><strong>Caminho:</strong> ${data.worstCase.path.join(' → ')}</p>
+                    <p><strong>Comprimento:</strong> ${data.worstCase.length} saltos</p>
+                    <p><strong>Probabilidade:</strong> ${(data.worstCase.probability * 100).toFixed(2)}% (${data.worstCase.probability.toFixed(4)})</p>
+                </div>
+
+                <h4 style="margin: 15px 0 10px 0;">📋 Todos os Caminhos Possíveis</h4>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Caminho</th>
+                            <th>Saltos</th>
+                            <th>Probabilidade</th>
+                            <th>%</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.allPaths.forEach((path, index) => {
+                const isBest = path.length === data.bestCase.length && path.path.join(',') === data.bestCase.path.join(',');
+                const isWorst = path.length === data.worstCase.length && path.path.join(',') === data.worstCase.path.join(',');
+                const rowClass = isBest ? 'best-value' : (isWorst ? 'worst-value' : '');
+
+                html += `
+                    <tr class="${rowClass}">
+                        <td>${index + 1}</td>
+                        <td style="font-size: 11px;">${path.path.join(' → ')}</td>
+                        <td>${path.length}</td>
+                        <td>${path.probability.toFixed(4)}</td>
+                        <td>${(path.probability * 100).toFixed(2)}%</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            content.innerHTML = html;
+            resultsBox.style.display = 'block';
+            resultsBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function handleExport() {
+            const svg = document.getElementById('network-graph');
+            const svgData = new XMLSerializer().serializeToString(svg);
+
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            const bbox = svg.getBBox();
+            canvas.width = bbox.width + 100;
+            canvas.height = bbox.height + 100;
+            const ctx = canvas.getContext('2d');
+
+            // White background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Create image from SVG
+            const img = new Image();
+            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function() {
+                ctx.drawImage(img, 50, 50);
+                URL.revokeObjectURL(url);
+
+                // Download
+                canvas.toBlob(function(blob) {
+                    const link = document.createElement('a');
+                    link.download = `topologia-p2p-${new Date().getTime()}.png`;
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+
+                    showStatus('✓ Topologia exportada com sucesso!', 'success');
+                });
+            };
+
+            img.src = url;
         }
 
         function showStatus(message, type) {
