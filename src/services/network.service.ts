@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Network } from '../domain/entities/network.entity';
 import { NetworkConfig } from '../parsers/network-config.interface';
 import { NetworkConfigParser } from '../parsers/network-config.parser';
-import { NetworkValidator, ValidationResult } from '../validators/network-validator';
+import {
+  NetworkValidator,
+  ValidationResult,
+} from '../validators/network-validator';
 
 @Injectable()
 export class NetworkService {
@@ -26,7 +29,9 @@ export class NetworkService {
 
   getNetwork(): Network {
     if (!this.network) {
-      throw new Error('Network not loaded. Please load a valid network configuration first.');
+      throw new Error(
+        'Network not loaded. Please load a valid network configuration first.',
+      );
     }
     return this.network;
   }

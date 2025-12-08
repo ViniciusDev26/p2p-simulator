@@ -10,5 +10,9 @@ export interface SearchConfig {
   node_id: string;
   resource_id: string;
   ttl: number;
-  algo: 'flooding' | 'informed_flooding' | 'random_walk' | 'informed_random_walk';
+  algo:
+    | 'flooding'
+    | 'informed_flooding'
+    | 'random_walk'
+    | 'informed_random_walk';
 }

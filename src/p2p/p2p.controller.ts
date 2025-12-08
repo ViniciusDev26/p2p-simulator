@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { NetworkService } from '../services/network.service';
 import { SearchService } from '../services/search.service';
 import { LoadNetworkDto } from './dto/load-network.dto';
@@ -30,11 +37,11 @@ export class P2PController {
         message: 'Network loaded successfully',
         info: this.networkService.getNetworkInfo(),
       };
-    } catch (error) {
+    } catch (error: unknown) {
       throw new HttpException(
         {
           message: 'Failed to load network',
-          error: error.message,
+          error: (error as Error).message,
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -84,11 +91,11 @@ export class P2PController {
         algorithm: searchDto.algo,
         result: result.toJSON(),
       };
-    } catch (error) {
+    } catch (error: unknown) {
       throw new HttpException(
         {
           message: 'Search failed',
-          error: error.message,
+          error: (error as Error).message,
         },
         HttpStatus.BAD_REQUEST,
       );

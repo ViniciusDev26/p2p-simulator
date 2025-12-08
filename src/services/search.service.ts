@@ -25,11 +25,18 @@ export class SearchService {
       [SearchAlgorithmType.FLOODING, this.floodingAlgorithm],
       [SearchAlgorithmType.INFORMED_FLOODING, this.informedFloodingAlgorithm],
       [SearchAlgorithmType.RANDOM_WALK, this.randomWalkAlgorithm],
-      [SearchAlgorithmType.INFORMED_RANDOM_WALK, this.informedRandomWalkAlgorithm],
+      [
+        SearchAlgorithmType.INFORMED_RANDOM_WALK,
+        this.informedRandomWalkAlgorithm,
+      ],
     ]);
   }
 
-  search(network: Network, params: SearchParams, algorithmType: SearchAlgorithmType): SearchResult {
+  search(
+    network: Network,
+    params: SearchParams,
+    algorithmType: SearchAlgorithmType,
+  ): SearchResult {
     const algorithm = this.algorithms.get(algorithmType);
 
     if (!algorithm) {

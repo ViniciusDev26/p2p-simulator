@@ -44,7 +44,9 @@ export class NetworkConfigParser {
     }
 
     if (config.max_neighbors < config.min_neighbors) {
-      throw new Error('max_neighbors must be greater than or equal to min_neighbors');
+      throw new Error(
+        'max_neighbors must be greater than or equal to min_neighbors',
+      );
     }
 
     if (!config.resources || Object.keys(config.resources).length === 0) {
@@ -68,7 +70,11 @@ export class NetworkConfigParser {
 
     for (const nodeId of Object.keys(config.resources)) {
       const nodeNumber = parseInt(nodeId.substring(1));
-      if (isNaN(nodeNumber) || nodeNumber < 1 || nodeNumber > config.num_nodes) {
+      if (
+        isNaN(nodeNumber) ||
+        nodeNumber < 1 ||
+        nodeNumber > config.num_nodes
+      ) {
         throw new Error(
           `Invalid node ID in resources: ${nodeId}. Must be between n1 and n${config.num_nodes}`,
         );
@@ -78,7 +84,11 @@ export class NetworkConfigParser {
     for (const edge of config.edges) {
       for (const nodeId of edge) {
         const nodeNumber = parseInt(nodeId.substring(1));
-        if (isNaN(nodeNumber) || nodeNumber < 1 || nodeNumber > config.num_nodes) {
+        if (
+          isNaN(nodeNumber) ||
+          nodeNumber < 1 ||
+          nodeNumber > config.num_nodes
+        ) {
           throw new Error(
             `Invalid node ID in edges: ${nodeId}. Must be between n1 and n${config.num_nodes}`,
           );

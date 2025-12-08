@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ISearchAlgorithm, SearchParams } from '../domain/interfaces/search-algorithm.interface';
+import {
+  ISearchAlgorithm,
+  SearchParams,
+} from '../domain/interfaces/search-algorithm.interface';
 import { Network } from '../domain/entities/network.entity';
 import { SearchResult } from '../domain/entities/search-result.entity';
 

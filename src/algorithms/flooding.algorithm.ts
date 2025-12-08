@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ISearchAlgorithm, SearchParams } from '../domain/interfaces/search-algorithm.interface';
+import {
+  ISearchAlgorithm,
+  SearchParams,
+} from '../domain/interfaces/search-algorithm.interface';
 import { Network } from '../domain/entities/network.entity';
 import { SearchResult } from '../domain/entities/search-result.entity';
 
@@ -22,9 +25,11 @@ export class FloodingAlgorithm implements ISearchAlgorithm {
     let totalMessages = 0;
     let foundNodeId: string | undefined = undefined;
 
-    const queue: Array<{ nodeId: string; currentTtl: number; currentPath: string[] }> = [
-      { nodeId, currentTtl: ttl, currentPath: [nodeId] },
-    ];
+    const queue: Array<{
+      nodeId: string;
+      currentTtl: number;
+      currentPath: string[];
+    }> = [{ nodeId, currentTtl: ttl, currentPath: [nodeId] }];
 
     while (queue.length > 0 && !foundNodeId) {
       const { nodeId: currentNodeId, currentTtl, currentPath } = queue.shift()!;
@@ -43,7 +48,9 @@ export class FloodingAlgorithm implements ISearchAlgorithm {
       if (currentNode.hasResource(resourceId)) {
         foundNodeId = currentNodeId;
         path.push(...currentPath);
-        console.log(`[Flooding] Recurso ${resourceId} encontrado em ${currentNodeId}`);
+        console.log(
+          `[Flooding] Recurso ${resourceId} encontrado em ${currentNodeId}`,
+        );
         break;
       }
 
