@@ -9,6 +9,7 @@ import { FloodingAlgorithm } from '../algorithms/flooding.algorithm';
 import { InformedFloodingAlgorithm } from '../algorithms/informed-flooding.algorithm';
 import { RandomWalkAlgorithm } from '../algorithms/random-walk.algorithm';
 import { InformedRandomWalkAlgorithm } from '../algorithms/informed-random-walk.algorithm';
+import { ExhaustiveRandomWalkAlgorithm } from '../algorithms/exhaustive-random-walk.algorithm';
 
 @Module({
   controllers: [P2PController],
@@ -22,6 +23,7 @@ import { InformedRandomWalkAlgorithm } from '../algorithms/informed-random-walk.
     InformedFloodingAlgorithm,
     RandomWalkAlgorithm,
     InformedRandomWalkAlgorithm,
+    ExhaustiveRandomWalkAlgorithm,
   ],
   exports: [NetworkService, SearchService, PathAnalyzerService],
 })

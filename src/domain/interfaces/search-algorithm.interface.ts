@@ -17,4 +17,5 @@ export enum SearchAlgorithmType {
   INFORMED_FLOODING = 'informed_flooding',
   RANDOM_WALK = 'random_walk',
   INFORMED_RANDOM_WALK = 'informed_random_walk',
+  EXHAUSTIVE_RANDOM_WALK = 'exhaustive_random_walk',
 }

@@ -10,6 +10,7 @@ import { FloodingAlgorithm } from '../algorithms/flooding.algorithm';
 import { InformedFloodingAlgorithm } from '../algorithms/informed-flooding.algorithm';
 import { RandomWalkAlgorithm } from '../algorithms/random-walk.algorithm';
 import { InformedRandomWalkAlgorithm } from '../algorithms/informed-random-walk.algorithm';
+import { ExhaustiveRandomWalkAlgorithm } from '../algorithms/exhaustive-random-walk.algorithm';
 
 @Injectable()
 export class SearchService {
@@ -20,6 +21,7 @@ export class SearchService {
     private readonly informedFloodingAlgorithm: InformedFloodingAlgorithm,
     private readonly randomWalkAlgorithm: RandomWalkAlgorithm,
     private readonly informedRandomWalkAlgorithm: InformedRandomWalkAlgorithm,
+    private readonly exhaustiveRandomWalkAlgorithm: ExhaustiveRandomWalkAlgorithm,
   ) {
     this.algorithms = new Map([
       [SearchAlgorithmType.FLOODING, this.floodingAlgorithm],
@@ -28,6 +30,10 @@ export class SearchService {
       [
         SearchAlgorithmType.INFORMED_RANDOM_WALK,
         this.informedRandomWalkAlgorithm,
+      ],
+      [
+        SearchAlgorithmType.EXHAUSTIVE_RANDOM_WALK,
+        this.exhaustiveRandomWalkAlgorithm,
       ],
     ]);
   }

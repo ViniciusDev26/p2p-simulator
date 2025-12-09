@@ -529,6 +529,7 @@
                                 <option value="informed_flooding">Informed Flooding</option>
                                 <option value="random_walk">Random Walk</option>
                                 <option value="informed_random_walk">Informed Random Walk</option>
+                                <option value="exhaustive_random_walk">Exhaustive Random Walk</option>
                             </select>
                         </div>
                     </div>
@@ -960,7 +961,8 @@
                 'flooding': 'Flooding',
                 'informed_flooding': 'Informed Flooding',
                 'random_walk': 'Random Walk',
-                'informed_random_walk': 'Informed Random Walk'
+                'informed_random_walk': 'Informed Random Walk',
+                'exhaustive_random_walk': 'Exhaustive Random Walk'
             };
 
             const foundText = result.found ? '✅ Encontrado' : '❌ Não encontrado';
@@ -998,7 +1000,7 @@
                 return;
             }
 
-            const algorithms = ['flooding', 'informed_flooding', 'random_walk', 'informed_random_walk'];
+            const algorithms = ['flooding', 'informed_flooding', 'random_walk', 'informed_random_walk', 'exhaustive_random_walk'];
             const results = [];
 
             try {
@@ -1042,7 +1044,8 @@
                 'flooding': 'Flooding',
                 'informed_flooding': 'Informed Flooding',
                 'random_walk': 'Random Walk',
-                'informed_random_walk': 'Informed Random Walk'
+                'informed_random_walk': 'Informed Random Walk',
+                'exhaustive_random_walk': 'Exhaustive Random Walk'
             };
 
             // Encontrar melhor e pior para cada métrica (entre os que encontraram)
